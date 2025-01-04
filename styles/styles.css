@@ -1,0 +1,27 @@
+/* 设置全局字体和背景颜色 */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+/* 设置应用标题的样式 */
+h1 {
+  text-align: center;
+  color: #333;
+  font-size: 36px;
+}
+
+/* 样式按钮 */
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}

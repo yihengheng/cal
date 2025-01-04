@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无敌计算器</title>
+
+    <!-- 引入 styles.css -->
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- 引入 manifest.json -->
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        .calculator {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 300px;
+        }
+
+        #display {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 15px;
+            font-size: 24px;
+            text-align: right;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f8f8f8;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 20px;
+            border: none;
+            background: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #d0d0d0;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .operator {
+            background: #ffa500;
+            color: white;
+        }
+
+        .operator:hover {
+            background: #ff8c00;
+        }
+
+        .equals {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .equals:hover {
+            background: #45a049;
+        }
+
+        .clear {
+            background: #ff4444;
+            color: white;
+        }
+
+        .clear:hover {
+            background: #ff3333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button onclick="clearDisplay()" class="clear">C</button>
+            <button onclick="appendToDisplay('(')">(</button>
+            <button onclick="appendToDisplay(')')">)</button>
+            <button onclick="appendToDisplay('/')" class="operator">÷</button>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button onclick="appendToDisplay('*')" class="operator">×</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button onclick="appendToDisplay('-')" class="operator">−</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button onclick="appendToDisplay('+')" class="operator">+</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button onclick="deleteLastChar()">←</button>
+            <button onclick="calculate()" class="equals">=</button>
+        </div>
+    </div>
+
+    <script>
+        // 添加键盘支持
+        document.addEventListener('keydown', function (event) {
+            const key = event.key;
+            if (/[0-9\+\-\*\/\(\)\.]/.test(key)) {
+                appendToDisplay(key);
+            } else if (key === 'Enter') {
+                calculate();
+            } else if (key === 'Backspace') {
+                deleteLastChar();
+            } else if (key === 'Escape') {
+                clearDisplay();
+            }
+        });
+
+        function appendToDisplay(value) {
+            const display = document.getElementById('display');
+            // 防止输入过长
+            if (display.value.length < 20) {
+                // 检查是否是有效的输入
+                if (isValidInput(display.value, value)) {
+                    display.value += value;
+                }
+            }
+        }
+
+        function isValidInput(currentValue, newValue) {
+            // 防止连续输入运算符
+            if (/[\+\-\*\/]/.test(newValue)) {
+                return !/[\+\-\*\/]$/.test(currentValue);
+            }
+            // 防止多个小数点
+            if (newValue === '.') {
+                const lastNumber = currentValue.split(/[\+\-\*\/]/).pop();
+                return !lastNumber.includes('.');
+            }
+            return true;
+        }
+
+        function clearDisplay() {
+            document.getElementById('display').value = '';
+        }
+
+        function deleteLastChar() {
+            const display = document.getElementById('display');
+            display.value = display.value.slice(0, -1);
+        }
+
+        function calculate() {
+            try {
+                const display = document.getElementById('display');
+                const result = eval(display.value);
+
+                // 检查结果是否有效
+                if (isFinite(result)) {
+                    // 限制小数位数
+                    display.value = Number(result.toFixed(8));
+                } else {
+                    display.value = 'Error';
+                }
+            } catch (error) {
+                document.getElementById('display').value = 'Error';
+            }
+        }
+
+        // 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
